@@ -12,6 +12,7 @@ A comprehensive toolkit for splitting, converting, and running vision-language m
 4. **ONNX + SafeTensor Pipeline** - Run with ONNX vision + SafeTensor LLM
 5. **Standalone Inference** - Export models with independent inference scripts
 6. **Performance Tracking** - Detailed metrics for CPU/GPU usage and latency
+7. **Comprehensive Benchmarking** - Multi-run benchmarks with statistical analysis
 
 ### 📦 Supported Formats
 
@@ -49,8 +50,12 @@ model_partitioner/
 ├── vision_pipeline.py            # Vision model inference pipeline
 ├── language_pipeline.py          # Language model inference pipeline
 ├── onnx_converter.py             # ONNX conversion utilities
+├── benchmark.py                  # Benchmarking suite
+├── run_all_examples.py           # Example runner
 ├── requirements.txt              # Dependencies
 ├── README.md                     # This file
+├── BENCHMARK_GUIDE.md            # Detailed benchmarking guide
+├── QUICKSTART.md                 # Quick start guide
 └── split_models/                 # Output directory (created at runtime)
     ├── vision_model/             # Vision model (.pt format)
     ├── language_model/           # Language model (.safetensors)
@@ -221,6 +226,58 @@ python model_partitioner_v2.py \
 - `--max-tokens`: Maximum tokens to generate (default: 128)
 - `--output-dir`: Output directory for split models (default: `split_models`)
 - `--quantize`: Enable 4-bit quantization
+
+## Benchmarking
+
+### Quick Benchmark
+
+Run comprehensive benchmarks across all modes:
+
+```bash
+# Basic benchmark (5 runs per mode)
+python benchmark.py --image demo.jpg --runs 5
+
+# Detailed benchmark (10 runs)
+python benchmark.py --image demo.jpg --runs 10 --output results.json --csv
+
+# Compare devices
+python benchmark.py --image demo.jpg --compare-devices --runs 5
+
+# Compare quantization
+python benchmark.py --image demo.jpg --compare-quantization --runs 5
+```
+
+### Benchmark Output
+
+```
+======================================================================
+BENCHMARK RESULTS SUMMARY
+======================================================================
+
+Mode            Metric                    Mean         Std          Min          Max         
+--------------------------------------------------------------------------------------
+original        Duration (s)              2.345        0.123        2.201        2.489       
+original        Tokens/sec                54.67        2.13         52.34        56.78       
+run_onnx        Duration (s)              1.845        0.089        1.756        1.934       
+run_onnx        Tokens/sec                69.35        3.21         66.14        72.56       
+
+⚡ Fastest Mode: run_onnx (1.845s)
+
+Relative Performance (vs run_onnx):
+  run_onnx       : 1.845s (1.00x, +0.0%)
+  original       : 2.345s (0.79x, +27.1%)
+```
+
+### Metrics Measured
+
+The benchmark suite measures:
+- **Latency**: Total inference time, preprocessing, generation
+- **Throughput**: Tokens per second
+- **Memory**: CPU and GPU usage (delta and peak)
+- **Model Size**: On-disk size of different formats
+- **Statistics**: Mean, std, min, max, median across multiple runs
+
+For detailed benchmarking guide, see [BENCHMARK_GUIDE.md](BENCHMARK_GUIDE.md)
 
 ## Performance Tracking
 
